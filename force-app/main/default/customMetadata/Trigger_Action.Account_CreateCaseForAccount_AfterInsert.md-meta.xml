@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" fullName="Trigger_Action.Account_CreateCaseForAccount_AfterInsert">
+    <label>Account Create Case For Account - After Insert</label>
+    <protected>false</protected>
+    <values>
+        <field>Apex_Class_Name__c</field>
+        <value xsi:type="xsd:string">TA_Account_CreateCaseForAccount</value>
+    </values>
+    <values>
+        <field>After_Insert__c</field>
+        <value xsi:type="xsd:string">Account</value>
+    </values>
+    <values>
+        <field>Order__c</field>
+        <value xsi:type="xsd:double">10</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Migrated from ATFE_CreateCaseForAccount trigger (after insert, now Inactive - see the trigger's own meta.xml - rather than deleted): creates a Sales Ops review Case for new ATI Accounts, owned by the region/sub-region's support queue, for users with a valid price book region (NA/EMEA/APAC) or the Customer Support Profile. Retains the UtilSODOFlags.skip_caseTrigges hand-rolled bypass in-code since that flag is also read by other, unconverted Case triggers (case_events_handling, SFSupport_case_events) - see conversion notes.</value>
+    </values>
+</CustomMetadata>
