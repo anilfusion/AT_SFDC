@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <environments>Default</environments>
+    <interviewLabel>TA Account New Account Creation Alert {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>TA Account New Account Creation Alert</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <status>Active</status>
+
+    <variables>
+        <name>record</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+        <objectType>Account</objectType>
+    </variables>
+
+    <formulas>
+        <name>PriceBookRegionCheck</name>
+        <dataType>Boolean</dataType>
+        <expression>AND(
+        INCLUDES( {!$User.Price_Book_Region__c}, &apos;NA&apos;),
+        INCLUDES( {!$User.Price_Book_Region__c}, &apos;CSA&apos;)
+    )</expression>
+    </formulas>
+
+    <decisions>
+        <name>Skip_JP_Record_Types</name>
+        <label>Skip JP Record Types</label>
+        <locationX>176</locationX>
+        <locationY>38</locationY>
+        <defaultConnectorLabel>Is JP Record Type</defaultConnectorLabel>
+        <rules>
+            <name>Proceed</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>record.RecordType.DeveloperName</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue>JP_Accounts</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>record.RecordType.DeveloperName</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue>JP_AccountsBeforeCleansing</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Current_User_PriceBook_Check</targetReference>
+            </connector>
+            <label>Proceed</label>
+        </rules>
+    </decisions>
+
+    <decisions>
+        <name>Current_User_PriceBook_Check</name>
+        <label>Current User PriceBook Check</label>
+        <locationX>176</locationX>
+        <locationY>134</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>NACA_PriceBook</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>PriceBookRegionCheck</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>New_Account_Creation_Alert</targetReference>
+            </connector>
+            <label>NACA- PriceBook</label>
+        </rules>
+    </decisions>
+
+    <actionCalls>
+        <name>New_Account_Creation_Alert</name>
+        <label>New Account Creation Alert</label>
+        <locationX>176</locationX>
+        <locationY>230</locationY>
+        <actionName>Account.New_Account_Creation_Alert</actionName>
+        <actionType>emailAlert</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>SObjectRowId</name>
+            <value>
+                <elementReference>record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>Account.New_Account_Creation_Alert</nameSegment>
+        <offset>0</offset>
+    </actionCalls>
+
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Skip_JP_Record_Types</targetReference>
+        </connector>
+    </start>
+</Flow>

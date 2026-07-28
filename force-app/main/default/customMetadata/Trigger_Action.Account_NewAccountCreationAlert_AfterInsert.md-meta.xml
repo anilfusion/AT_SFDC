@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" fullName="Trigger_Action.Account_NewAccountCreationAlert_AfterInsert">
+    <label>Account New Account Creation Alert - After Insert</label>
+    <protected>false</protected>
+    <values>
+        <field>Apex_Class_Name__c</field>
+        <value xsi:type="xsd:string">TriggerActionFlow</value>
+    </values>
+    <values>
+        <field>After_Insert__c</field>
+        <value xsi:type="xsd:string">Account</value>
+    </values>
+    <values>
+        <field>Order__c</field>
+        <value xsi:type="xsd:double">30</value>
+    </values>
+    <values>
+        <field>Flow_Name__c</field>
+        <value xsi:type="xsd:string">TA_Account_NewAccountCreationAlert</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Migrated from Account_After_Save_Flow (after-save, create only via source ISNEW() guard - now expressed as after-insert-only context instead of an in-flow check): sends the Account.New_Account_Creation_Alert email alert when the running user's Price_Book_Region__c includes both NA and CSA. Order bumped from 10 to 30 when ATFE_CreateCaseForAccount/ATFE_SendChatterMessage were migrated, to preserve the platform's real order of execution (after-insert Apex triggers run before after-save record-triggered flows).</value>
+    </values>
+</CustomMetadata>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" fullName="Trigger_Action.Account_PriceBookRegionReassignment_BeforeInsert">
+    <label>Account PriceBook Region Reassignment - Before Insert</label>
+    <protected>false</protected>
+    <values>
+        <field>Apex_Class_Name__c</field>
+        <value xsi:type="xsd:string">TriggerActionFlow</value>
+    </values>
+    <values>
+        <field>Before_Insert__c</field>
+        <value xsi:type="xsd:string">Account</value>
+    </values>
+    <values>
+        <field>Order__c</field>
+        <value xsi:type="xsd:double">20</value>
+    </values>
+    <values>
+        <field>Flow_Name__c</field>
+        <value xsi:type="xsd:string">TA_Account_PriceBookRegionReassignment</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Migrated from Account_Before_Save_Flow (before-save, create only via source ISNEW() guard - now expressed as before-insert-only context instead of an in-flow check): reassigns OwnerId to the AccountOwnerId label value and sets Region__c = 'NA' for new Accounts when the running user's Price_Book_Region__c includes both NA and CSA.</value>
+    </values>
+</CustomMetadata>

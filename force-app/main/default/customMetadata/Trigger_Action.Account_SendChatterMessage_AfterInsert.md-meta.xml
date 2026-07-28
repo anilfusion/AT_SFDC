@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" fullName="Trigger_Action.Account_SendChatterMessage_AfterInsert">
+    <label>Account Send Chatter Message - After Insert</label>
+    <protected>false</protected>
+    <values>
+        <field>Apex_Class_Name__c</field>
+        <value xsi:type="xsd:string">TA_Account_SendChatterMessage</value>
+    </values>
+    <values>
+        <field>After_Insert__c</field>
+        <value xsi:type="xsd:string">Account</value>
+    </values>
+    <values>
+        <field>Order__c</field>
+        <value xsi:type="xsd:double">20</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Migrated from ATFE_SendChatterMessage trigger (originally after insert, after update - update leg was a no-op since the body only ran under trigger.isInsert, so only an after-insert action was generated; source trigger is now Inactive - see its own meta.xml - rather than deleted): posts a Chatter feed notification to NA_Account_Ops / EMEA_Account_Ops group members when a new Account is created by a user with a valid price book region (NA/EMEA), excluding one hardcoded profile Id from source.</value>
+    </values>
+</CustomMetadata>

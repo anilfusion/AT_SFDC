@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <environments>Default</environments>
+    <interviewLabel>TA Account PriceBook Region Reassignment {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>TA Account PriceBook Region Reassignment</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <status>Active</status>
+
+    <variables>
+        <name>record</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+        <objectType>Account</objectType>
+    </variables>
+
+    <formulas>
+        <name>AccountOwnerId</name>
+        <dataType>String</dataType>
+        <expression>{!$Label.AccountOwnerId}</expression>
+    </formulas>
+    <formulas>
+        <name>PriceBookRegionCheck</name>
+        <dataType>Boolean</dataType>
+        <expression>AND(
+        INCLUDES( {!$User.Price_Book_Region__c}, &apos;NA&apos;),
+        INCLUDES( {!$User.Price_Book_Region__c}, &apos;CSA&apos;)
+    )</expression>
+    </formulas>
+
+    <decisions>
+        <name>Skip_JP_Record_Types</name>
+        <label>Skip JP Record Types</label>
+        <locationX>176</locationX>
+        <locationY>38</locationY>
+        <defaultConnectorLabel>Is JP Record Type</defaultConnectorLabel>
+        <rules>
+            <name>Proceed</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>record.RecordType.DeveloperName</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue>JP_Accounts</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>record.RecordType.DeveloperName</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue>JP_AccountsBeforeCleansing</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Current_User_PriceBook_Check</targetReference>
+            </connector>
+            <label>Proceed</label>
+        </rules>
+    </decisions>
+
+    <decisions>
+        <name>Current_User_PriceBook_Check</name>
+        <label>Current User PriceBook Check</label>
+        <locationX>176</locationX>
+        <locationY>134</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>CurrentUserPriceBook_NACSA</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>PriceBookRegionCheck</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Should_Update_Account</targetReference>
+            </connector>
+            <label>CurrentUserPriceBook-NACSA</label>
+        </rules>
+    </decisions>
+
+    <decisions>
+        <name>Should_Update_Account</name>
+        <label>Should Update Account</label>
+        <locationX>176</locationX>
+        <locationY>230</locationY>
+        <defaultConnectorLabel>No Change</defaultConnectorLabel>
+        <rules>
+            <name>NeedsUpdate</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>record.OwnerId</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>AccountOwnerId</elementReference>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>record.Region__c</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue>NA</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_Account_Owner_And_Region</targetReference>
+            </connector>
+            <label>Needs Update</label>
+        </rules>
+    </decisions>
+
+    <assignments>
+        <name>Set_Account_Owner_And_Region</name>
+        <label>Set Account Owner And Region</label>
+        <locationX>176</locationX>
+        <locationY>326</locationY>
+        <assignmentItems>
+            <assignToReference>record.OwnerId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>AccountOwnerId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>record.Region__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>NA</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Skip_JP_Record_Types</targetReference>
+        </connector>
+    </start>
+</Flow>
