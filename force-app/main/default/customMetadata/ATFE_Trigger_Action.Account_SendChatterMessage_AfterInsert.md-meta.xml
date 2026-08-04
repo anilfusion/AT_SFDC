@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Account Send Chatter Msg - After Insert</label>
+    <protected>false</protected>
+    <values>
+        <field>ATFE_After_Delete__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ATFE_After_Insert__c</field>
+        <value xsi:type="xsd:string">Account</value>
+    </values>
+    <values>
+        <field>ATFE_After_Undelete__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ATFE_After_Update__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ATFE_Allow_Flow_Recursion__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>ATFE_Apex_Class_Name__c</field>
+        <value xsi:type="xsd:string">TA_Account_SendChatterMessage</value>
+    </values>
+    <values>
+        <field>ATFE_Before_Delete__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ATFE_Before_Insert__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ATFE_Before_Update__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ATFE_Bypass_Execution__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>ATFE_Bypass_Permission__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ATFE_Description__c</field>
+        <value xsi:type="xsd:string">Migrated from ATFE_SendChatterMessage trigger (originally after insert, after update - update leg was a no-op since the body only ran under trigger.isInsert, so only an after-insert action was generated; source trigger is now Inactive - see its own meta.xml - rather than deleted): posts a Chatter feed notification to NA_Account_Ops / EMEA_Account_Ops group members when a new Account is created by a user with a valid price book region (NA/EMEA), excluding one hardcoded profile Id from source.</value>
+    </values>
+    <values>
+        <field>ATFE_Entry_Criteria__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ATFE_Flow_Name__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ATFE_Maximum_Recurrsion_Count__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ATFE_Order__c</field>
+        <value xsi:type="xsd:double">20.0</value>
+    </values>
+    <values>
+        <field>ATFE_Required_Permission__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>
