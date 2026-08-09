@@ -59,10 +59,6 @@
         <value xsi:type="xsd:string">TA_Account_NewAccountCreationAlert</value>
     </values>
     <values>
-        <field>ATFE_Maximum_Recurrsion_Count__c</field>
-        <value xsi:nil="true"/>
-    </values>
-    <values>
         <field>ATFE_Order__c</field>
         <value xsi:type="xsd:double">30.0</value>
     </values>
