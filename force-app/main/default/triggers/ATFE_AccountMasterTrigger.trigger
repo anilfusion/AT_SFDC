@@ -1,4 +1,4 @@
-trigger AT_AccountMasterTrigger on Account (
+trigger ATFE_AccountMasterTrigger on Account (
     before insert,
     after insert,
     before update
