@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>TA_Account_LocTzInsert</members>
+        <members>TA_Account_LocTzInsert_Test</members>
+        <members>TA_Account_LocTzUpdate</members>
+        <members>TA_Account_LocTzUpdate_Test</members>
+        <members>TA_Account_TzFromBusiness</members>
+        <members>TA_Account_TzFromBusiness_Test</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>locationTrigger</members>
+        <name>ApexTrigger</name>
+    </types>
+    <types>
+        <members>ATFE_Trigger_Action.Account_LocTzInsert_BeforeInsert</members>
+        <members>ATFE_Trigger_Action.Account_LocTzInsert_AfterInsert</members>
+        <members>ATFE_Trigger_Action.Account_LocTzUpdate_BeforeUpdate</members>
+        <members>ATFE_Trigger_Action.Account_TzFromBusiness_BeforeUpdate</members>
+        <name>CustomMetadata</name>
+    </types>
+    <version>65.0</version>
+</Package>
