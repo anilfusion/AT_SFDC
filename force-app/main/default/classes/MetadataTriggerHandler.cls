@@ -281,6 +281,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	 * @return The list of Trigger Action metadata for the specified relationship.
 	 */
 	private list<ATFE_Trigger_Action__mdt> getActionMetadata(String relationshipName) {
+		relationshipName = 'ATFE_' + relationshipName;
 		if (!sObjectToContextToActions.containsKey(this.sObjectName)) {
 			sObjectToContextToActions.put(
 				this.sObjectName,
