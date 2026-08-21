@@ -1,73 +1,55 @@
 public class TA_Account_SendChatterMessage implements TriggerAction.AfterInsert {
 
-    public void afterInsert(List<Account> triggerNew) {
-        Set<Id> naSalesOpsUserIds = new Set<Id>();
-        Set<Id> emeaSalesOpsUserIds = new Set<Id>();
-        List<FeedItem> feedsToInsert = new List<FeedItem>();
+    private static final String FEED_BODY = 'A new account has been created. To view the account please click on the following link:';
 
+    private static final Map<String, String> GROUP_DEVELOPER_NAME_BY_REGION = new Map<String, String>{
+        'NA' => 'NA_Account_Ops',
+        'EMEA' => 'EMEA_Account_Ops'
+    };
+
+    public void afterInsert(List<Account> triggerNew) {
         User currentUser = [SELECT Profile.Name, Price_Book_Region__c FROM User WHERE Id = :UserInfo.getUserId()];
         Boolean hasValidRegion = ATFE_Utility.validateUserPriceBookRegion(currentUser, new Set<String>{'NA', 'EMEA'});
 
         if (!hasValidRegion) {
             return;
         }
-
-        // Excludes a specific hardcoded profile from source (see original ATFE_SendChatterMessage trigger).
-        if (UserInfo.getProfileId() == '00eg0000000DjuDAAS') {
-            return;
-        }
-
-        Map<String, Schema.RecordTypeInfo> acctRtMapByDeveloperName = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName();
-        Set<Id> excludedRecordTypeIds = new Set<Id>();
-        for (String developerName : new Set<String>{'JP_Accounts', 'JP_AccountsBeforeCleansing'}) {
-            if (acctRtMapByDeveloperName.containsKey(developerName)) {
-                excludedRecordTypeIds.add(acctRtMapByDeveloperName.get(developerName).getRecordTypeId());
-            }
-        }
-
-        List<Account> recordsToProcess = new List<Account>();
-        for (Account acc : triggerNew) {
-            if (!excludedRecordTypeIds.contains(acc.RecordTypeId)) {
-                recordsToProcess.add(acc);
-            }
-        }
+        
+        List<Account> recordsToProcess = TA_Account_TriggerHelper.excludeRecordTypes(triggerNew);
         if (recordsToProcess.isEmpty()) {
             return;
         }
 
+        Map<String, Set<Id>> userIdsByRegion = new Map<String, Set<Id>>();
         for (GroupMember gm : [
-            SELECT UserOrGroupId, GroupId, Group.DeveloperName
+            SELECT UserOrGroupId, Group.DeveloperName
             FROM GroupMember
-            WHERE Group.DeveloperName IN ('NA_Account_Ops', 'EMEA_Account_Ops')
+            WHERE Group.DeveloperName IN :GROUP_DEVELOPER_NAME_BY_REGION.values()
         ]) {
-            if (gm.Group.DeveloperName == 'NA_Account_Ops') {
-                naSalesOpsUserIds.add(gm.UserOrGroupId);
-            } else if (gm.Group.DeveloperName == 'EMEA_Account_Ops') {
-                emeaSalesOpsUserIds.add(gm.UserOrGroupId);
+            for (String region : GROUP_DEVELOPER_NAME_BY_REGION.keySet()) {
+                if (GROUP_DEVELOPER_NAME_BY_REGION.get(region) == gm.Group.DeveloperName) {
+                    if (!userIdsByRegion.containsKey(region)) {
+                        userIdsByRegion.put(region, new Set<Id>());
+                    }
+                    userIdsByRegion.get(region).add(gm.UserOrGroupId);
+                }
             }
         }
 
+        List<FeedItem> feedsToInsert = new List<FeedItem>();
         for (Account acc : recordsToProcess) {
-            if (acc.Region__c == 'NA') {
-                for (Id userId : naSalesOpsUserIds) {
-                    FeedItem post = new FeedItem();
-                    post.ParentId = userId;
-                    post.Body = 'A new account has been created. To view the account please click on the following link:';
-                    post.LinkUrl = '/' + acc.Id;
-                    post.Title = acc.Name;
-                    feedsToInsert.add(post);
-                }
+            Set<Id> userIds = userIdsByRegion.get(acc.Region__c);
+            if (userIds == null) {
+                continue;
             }
 
-            if (acc.Region__c == 'EMEA') {
-                for (Id userId : emeaSalesOpsUserIds) {
-                    FeedItem post = new FeedItem();
-                    post.ParentId = userId;
-                    post.Body = 'A new account has been created. To view the account please click on the following link:';
-                    post.LinkUrl = '/' + acc.Id;
-                    post.Title = acc.Name;
-                    feedsToInsert.add(post);
-                }
+            for (Id userId : userIds) {
+                feedsToInsert.add(new FeedItem(
+                    ParentId = userId,
+                    Body = FEED_BODY,
+                    LinkUrl = '/' + acc.Id,
+                    Title = acc.Name
+                ));
             }
         }
 

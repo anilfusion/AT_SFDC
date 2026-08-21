@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>TA_Account_SendChatterMessage</members>
+        <members>TA_Account_TzFromBusiness</members>
+        <members>TA_Account_LocTzUpdate</members>
+        <members>TA_Account_LocTzInsert</members>
+        <members>TA_Account_CreateCaseForAccount</members>
+        <members>TA_Account_TriggerHelper</members>
+        <name>ApexClass</name>
+    </types>
+    <version>65.0</version>
+</Package>

@@ -5,7 +5,7 @@ public class TA_Account_LocTzInsert implements TriggerAction.BeforeInsert, Trigg
             return;
         }
 
-        for (Account acc : recordsToProcess(triggerNew)) {
+        for (Account acc : TA_Account_TriggerHelper.excludeRecordTypes(triggerNew)) {
             acc.Timezone_Updated__c = true;
         }
     }
@@ -16,7 +16,7 @@ public class TA_Account_LocTzInsert implements TriggerAction.BeforeInsert, Trigg
         }
 
         List<Id> accountIds = new List<Id>();
-        for (Account acc : recordsToProcess(triggerNew)) {
+        for (Account acc : TA_Account_TriggerHelper.excludeRecordTypes(triggerNew)) {
             accountIds.add(acc.Id);
         }
 
@@ -34,23 +34,5 @@ public class TA_Account_LocTzInsert implements TriggerAction.BeforeInsert, Trigg
             }
         }
         return false;
-    }
-
-    private List<Account> recordsToProcess(List<Account> triggerNew) {
-        Map<String, Schema.RecordTypeInfo> acctRtMapByDeveloperName = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName();
-        Set<Id> excludedRecordTypeIds = new Set<Id>();
-        for (String developerName : new Set<String>{'JP_Accounts', 'JP_AccountsBeforeCleansing'}) {
-            if (acctRtMapByDeveloperName.containsKey(developerName)) {
-                excludedRecordTypeIds.add(acctRtMapByDeveloperName.get(developerName).getRecordTypeId());
-            }
-        }
-
-        List<Account> records = new List<Account>();
-        for (Account acc : triggerNew) {
-            if (!excludedRecordTypeIds.contains(acc.RecordTypeId)) {
-                records.add(acc);
-            }
-        }
-        return records;
     }
 }
