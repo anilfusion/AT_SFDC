@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>ATFE_SBBQQuoteLineTriggerHandler</members>
+        <members>BatchUpdateProductCogs</members>
+        <members>TA_Product2_TriggerHelper</members>
+        <members>TA_Product2_SyncQuoteLineCogs</members>
+        <members>TA_Product2_SyncQuoteEosFlags</members>
+        <!--members>TA_Product2_SyncQuoteLineCogs_Test</members-->
+        <!--members>TA_Product2_SyncQuoteEosFlags_Test</members-->
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>ATFE_ProductMasterTrigger</members>
+        <members>ProductCogsTrigger</members>
+        <members>ProductTrigger</members>
+        <name>ApexTrigger</name>
+    </types>
+    <types>
+        <members>Product_After_Save_Master_Flow</members>
+        <members>TA_Product2_ProductRegionKey</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>ATFE_sObject_Trigger_Setting.Product2</members>
+        <members>ATFE_Trigger_Action.Product2_RegionKey_BeforeInsert</members>
+        <members>ATFE_Trigger_Action.Product2_RegionKey_BeforeUpdate</members>
+        <members>ATFE_Trigger_Action.Product2_CogsSync_AfterUpdate</members>
+        <members>ATFE_Trigger_Action.Product2_EosFlagSync_AfterUpdate</members>
+        <name>CustomMetadata</name>
+    </types>
+    <version>65.0</version>
+</Package>
