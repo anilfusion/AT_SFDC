@@ -83,7 +83,7 @@ public without sharing class BatchUpdateProductCogs implements Database.Batchabl
                 return;
             }
 
-            updates = Security.stripInaccessible(AccessType.UPDATABLE, updates).getRecords();
+            //updates = Security.stripInaccessible(AccessType.UPDATABLE, updates).getRecords();
 
             ATFE_PLMUpdateOnQuickQuoteHelper.DoNotRunATFE_SBBQQuoteLineTrigger = true;
             try {

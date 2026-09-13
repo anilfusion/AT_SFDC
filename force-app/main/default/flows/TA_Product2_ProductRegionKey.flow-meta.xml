@@ -110,4 +110,12 @@
         <isOutput>true</isOutput>
         <objectType>Product2</objectType>
     </variables>
+    <variables>
+        <name>recordPrior</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+        <objectType>Product2</objectType>
+    </variables>
 </Flow>

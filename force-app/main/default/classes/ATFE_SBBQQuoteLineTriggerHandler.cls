@@ -98,7 +98,7 @@ public without sharing class ATFE_SBBQQuoteLineTriggerHandler {
             return;
         }
 
-        quotesToUpdate = Security.stripInaccessible(AccessType.UPDATABLE, quotesToUpdate).getRecords();
+        //quotesToUpdate = Security.stripInaccessible(AccessType.UPDATABLE, quotesToUpdate).getRecords();
         update quotesToUpdate;
     }
 }
