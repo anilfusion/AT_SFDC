@@ -37,6 +37,7 @@ public class ATFE_EOSUpdateQueueable implements Queueable {
 				for (Database.Error err : sr.getErrors()) {
 					message += ' Error = ' + err.getMessage() + ' | Fields = ' + err.getFields() + ' | ';
 				}
+				iterator++;
 			}
 		}
 
