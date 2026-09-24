@@ -9,5 +9,9 @@
         <members>QuoteLineTrigger</members>
         <name>ApexTrigger</name>
     </types>
+    <types>
+        <members>EOSUpdateFailureRecipients</members>
+        <name>CustomLabel</name>
+    </types>
     <version>65.0</version>
 </Package>
