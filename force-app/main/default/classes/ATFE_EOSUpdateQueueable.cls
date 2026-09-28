@@ -42,12 +42,28 @@ public class ATFE_EOSUpdateQueueable implements Queueable {
 		}
 
 		if(hasError || Test.isRunningTest()) {
+            
+            //Check if Email Deliverability is enabled or if limits are not hit
+            Boolean isEmailDeliverabilityEnabled = true;
+
+            try {
+                Messaging.reserveSingleEmailCapacity(1);
+            } catch (System.NoAccessException e) {
+                isEmailDeliverabilityEnabled = false;
+            } catch (System.HandledException e) {
+                isEmailDeliverabilityEnabled = false;
+            }
+            
+            
 			Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
 			String[] toAddresses = (System.Label.EOSUpdateFailureRecipients).split(';');
 			mail.setToAddresses(toAddresses);
 			mail.setSubject('HIGH PRIORITY: EOS Update Failed!');
 			mail.setPlainTextBody(message);
-			Messaging.SendEmailResult[] sendEmailResults = Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+            
+            if(isEmailDeliverabilityEnabled) {
+				Messaging.SendEmailResult[] sendEmailResults = Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+            }
 		}
 		
 	}

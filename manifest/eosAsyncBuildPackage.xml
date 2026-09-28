@@ -3,6 +3,7 @@
     <types>
         <members>ATFE_SBBQQuoteLineTriggerHandler</members>
         <members>ATFE_EOSUpdateQueueable</members>
+        <members>ATFE_EOSUpdateQueueableTest</members>
         <name>ApexClass</name>
     </types>
     <types>
