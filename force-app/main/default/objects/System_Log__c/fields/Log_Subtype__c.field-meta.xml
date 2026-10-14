@@ -10,22 +10,22 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>BATCH_APEX</fullName>
+                <fullName>Batch Apex</fullName>
                 <default>false</default>
                 <label>Batch Apex</label>
             </value>
             <value>
-                <fullName>APEX_TRIGGER</fullName>
+                <fullName>Apex Trigger</fullName>
                 <default>false</default>
                 <label>Apex Trigger</label>
             </value>
             <value>
-                <fullName>QUEUEABLE_APEX</fullName>
+                <fullName>Queueable Apex</fullName>
                 <default>false</default>
                 <label>Queueable Apex</label>
             </value>
             <value>
-                <fullName>APEX_CONTROLLER</fullName>
+                <fullName>Apex Controller</fullName>
                 <default>false</default>
                 <label>Apex Controller</label>
             </value>
@@ -35,57 +35,57 @@
                 <label>LWC</label>
             </value>
             <value>
-                <fullName>AURA</fullName>
+                <fullName>Aura</fullName>
                 <default>false</default>
                 <label>Aura</label>
             </value>
             <value>
-                <fullName>VISUALFORCE_PAGE</fullName>
+                <fullName>Visualforce Page</fullName>
                 <default>false</default>
                 <label>Visualforce Page</label>
             </value>
             <value>
-                <fullName>SCREEN_FLOW</fullName>
+                <fullName>Screen Flow</fullName>
                 <default>false</default>
                 <label>Screen Flow</label>
             </value>
             <value>
-                <fullName>RECORD_TRIGGERED_FLOW</fullName>
+                <fullName>Record Triggered Flow</fullName>
                 <default>false</default>
                 <label>Record Triggered Flow</label>
             </value>
             <value>
-                <fullName>PLATFORM_EVENT</fullName>
+                <fullName>Platform Event</fullName>
                 <default>false</default>
                 <label>Platform Event</label>
             </value>
             <value>
-                <fullName>PUSH_TOPICS</fullName>
+                <fullName>Push Topics</fullName>
                 <default>false</default>
                 <label>Push Topics</label>
             </value>
             <value>
-                <fullName>BUTTON_CLICK</fullName>
+                <fullName>Button Click</fullName>
                 <default>false</default>
                 <label>Button Click</label>
             </value>
             <value>
-                <fullName>DATA_UPSERT</fullName>
+                <fullName>Data Upsert</fullName>
                 <default>false</default>
                 <label>Data Upsert</label>
             </value>
             <value>
-                <fullName>DATA_DELETION</fullName>
+                <fullName>Data Deletio</fullName>
                 <default>false</default>
                 <label>Data Deletion</label>
             </value>
             <value>
-                <fullName>LOGIN</fullName>
+                <fullName>Login</fullName>
                 <default>false</default>
                 <label>Login</label>
             </value>
             <value>
-                <fullName>SEND_EMAIL</fullName>
+                <fullName>Send Email</fullName>
                 <default>false</default>
                 <label>Send Email</label>
             </value>

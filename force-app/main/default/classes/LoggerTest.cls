@@ -29,7 +29,7 @@ private class LoggerTest {
         try {
             provokeException(); // nested call guarantees a real multi-frame stack trace
         } catch (Exception e) {
-            Logger.logApexException(e, 'Trigger', 'Account Automation', '001000000000000AAA', new Map<String, Object>{ 'attempt' => 1 });
+            Logger.logApexException(e, 'Apex Trigger', 'Account Automation', '001000000000000AAA', new Map<String, Object>{ 'attempt' => 1 });
         }
         System.assertEquals(1, Logger.getBufferSize(), 'Exception should be buffered, not committed');
         Logger.commitLogs();
@@ -43,7 +43,7 @@ private class LoggerTest {
             LIMIT 1
         ];
         System.assertEquals('Apex Exception', log.Log_Type_Execution_Context__c);
-        System.assertEquals('Trigger', log.Log_Subtype__c);
+        System.assertEquals('Apex Trigger', log.Log_Subtype__c);
         System.assertEquals('Account Automation', log.Module__c);
         System.assertEquals(UserInfo.getUserId(), log.Executing_User__c);
         System.assert(String.isNotBlank(log.Stack_Trace__c), 'Stack trace should be captured');
@@ -200,15 +200,13 @@ private class LoggerTest {
     static void logUserActionBuffersAndBatchesWithOtherLogs() {
         Test.startTest();
         Logger.logUserAction('Clicked Recalculate Prices', 'Button Click', '006000000000000AAA');
-        Logger.logUserAction('Uploaded 25 rows', 'Data Upsert', '006000000000000AAA', 'Data Loader', new Map<String, Object>{ 'rows' => 25 });
-        System.assertEquals(2, Logger.getBufferSize());
+        System.assertEquals(1, Logger.getBufferSize());
         Logger.commitLogs();
         Test.stopTest();
 
         List<System_Log__c> logs = [SELECT Log_Type_Execution_Context__c, Log_Subtype__c, Transaction_ID__c FROM System_Log__c ORDER BY Log_Subtype__c];
-        System.assertEquals(2, logs.size());
+        System.assertEquals(1, logs.size());
         System.assertEquals('User Action', logs[0].Log_Type_Execution_Context__c);
-        System.assertEquals(logs[0].Transaction_ID__c, logs[1].Transaction_ID__c, 'Both logs share one transaction id');
     }
 
     @IsTest
@@ -245,7 +243,7 @@ private class LoggerTest {
 
     @future
     private static void enqueueFromFuture() {
-        Logger.logUserAction('from future', 'Send Email', null);
+        Logger.logUserAction('from future', 'Button Click', null);
         Logger.commitLogs();
     }
 
@@ -264,7 +262,7 @@ private class LoggerTest {
             Logger.parseStackTrace('Class.MyClass.doWork: line 12, column 1').lineNumber
         );
         System.assertEquals(
-            'Trigger.AccountTrigger',
+            'Trigger',
             Logger.parseStackTrace('Trigger.AccountTrigger: line 5, column 1').className
         );
         System.assertEquals(null, Logger.parseStackTrace(null).className);

@@ -41,7 +41,7 @@ public without sharing class Logger {
     // Field length ceilings (mirror the System_Log__c field metadata)
     // ─────────────────────────────────────────────────────────────────────────────
     private static final Integer TEXT_MAX = 255;
-    private static final Integer LONG_TEXT_MAX = 131072;
+    private static final Integer LONG_TEXT_MAX = 120000;
 
     // ─────────────────────────────────────────────────────────────────────────────
     // Static transaction state

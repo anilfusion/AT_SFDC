@@ -10,37 +10,37 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>APEX_EXCEPTION</fullName>
+                <fullName>Apex Exception</fullName>
                 <default>false</default>
                 <label>Apex Exception</label>
             </value>
             <value>
-                <fullName>FLOW_EXCEPTION</fullName>
+                <fullName>Flow Exception</fullName>
                 <default>false</default>
                 <label>Flow Exception</label>
             </value>
             <value>
-                <fullName>UI_EXCEPTION</fullName>
+                <fullName>UI Exception</fullName>
                 <default>false</default>
                 <label>UI Exception</label>
             </value>
             <value>
-                <fullName>API_TRANSACTION</fullName>
+                <fullName>API Transaction</fullName>
                 <default>false</default>
                 <label>API Transaction</label>
             </value>
             <value>
-                <fullName>GENERIC_TRANSACTION</fullName>
+                <fullName>Generic Transaction</fullName>
                 <default>false</default>
                 <label>Generic Transaction</label>
             </value>
             <value>
-                <fullName>USER_ACTION</fullName>
+                <fullName>User Action</fullName>
                 <default>false</default>
                 <label>User Action</label>
             </value>
             <value>
-                <fullName>STREAMING_API</fullName>
+                <fullName>Streaming API</fullName>
                 <default>false</default>
                 <label>Streaming API</label>
             </value>

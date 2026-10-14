@@ -7,7 +7,7 @@ private class LoggerQueueableTest {
     static void executeInsertsBufferedLogs() {
         List<System_Log__c> logs = new List<System_Log__c>{
             new System_Log__c(Transaction_ID__c = 'txn-1', Log_Type_Execution_Context__c = 'Generic Transaction', Message__c = 'one'),
-            new System_Log__c(Transaction_ID__c = 'txn-1', Log_Type_Execution_Context__c = 'Generic Transaction', Message__c = 'two')
+            new System_Log__c(Transaction_ID__c = 'txn-2', Log_Type_Execution_Context__c = 'Generic Transaction', Message__c = 'two')
         };
 
         Test.startTest();
