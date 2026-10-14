@@ -181,7 +181,7 @@ global class FormulaFilter {
 		TriggerOperation context
 	) {
 		return ((ATFE_sObject_Trigger_Setting__mdt) this.triggerActionConfiguration.getSObject(
-				this.context.name() + '__r'
+				'ATFE_' + this.context.name() + '__r'
 			))
 			?.ATFE_TriggerRecord_Class_Name__c;
 	}

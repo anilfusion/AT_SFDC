@@ -31,7 +31,7 @@ private class TA_Account_LocTzInsert_Test {
         new TA_Account_LocTzInsert().beforeInsert(new List<Account>{ acc });
         Test.stopTest();
 
-        System.assertEquals(null, acc.Timezone_Updated__c, 'JP_Accounts record type should be excluded from this action');
+        System.assertEquals(false, acc.Timezone_Updated__c, 'JP_Accounts record type should be excluded from this action');
     }
 
     @isTest
@@ -45,7 +45,7 @@ private class TA_Account_LocTzInsert_Test {
         new TA_Account_LocTzInsert().beforeInsert(new List<Account>{ sansanAcc, otherAcc });
         Test.stopTest();
 
-        System.assertEquals(null, otherAcc.Timezone_Updated__c, 'Entire batch should be skipped when any record came from Sansan');
+        System.assertEquals(false, otherAcc.Timezone_Updated__c, 'Entire batch should be skipped when any record came from Sansan');
     }
 
     @isTest
