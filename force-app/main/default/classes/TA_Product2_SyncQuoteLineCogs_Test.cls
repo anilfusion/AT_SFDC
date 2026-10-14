@@ -136,4 +136,14 @@ private class TA_Product2_SyncQuoteLineCogs_Test {
         System.assertEquals(input.size(), result.size(),
             'Products that are not the JP_Product record type should pass through unchanged');
     }
+    
+    @isTest
+    static void test_exceptionScenario() {
+        Id pid = fakeId(PRODUCT2_PREFIX);
+        Id rtId = fakeId(RECORDTYPE_PREFIX);
+        List<Product2> oldList;
+        List<Product2> newList;
+
+        asyncCallsFor(newList, oldList);
+    }
 }
