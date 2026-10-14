@@ -17,7 +17,7 @@
     <types>
         <members>ATFE_CreateCaseForAccount</members>
         <members>ATFE_SendChatterMessage</members>
-        <members>AT_AccountMasterTrigger</members>
+        <members>ATFE_AccountMasterTrigger</members>
         <members>locationTrigger</members>
         <name>ApexTrigger</name>
     </types>
