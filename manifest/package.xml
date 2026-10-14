@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>System_Log__c.Log_Subtype__c</members>
+        <members>System_Log__c.Log_Type_Execution_Context__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>TA_Product2_SyncQuoteLineCogs_Test</members>
+        <members>TA_Product2_SyncQuoteEosFlags_Test</members>
+        <members>TA_Account_LocTzInsert_Test</members>
+        <members>Logger</members>
+        <members>LoggerQueueableTest</members>
+        <members>LoggerTest</members>
+        <members>FormulaFilter</members>
+        <name>ApexClass</name>
+    </types>
+    <version>65.0</version>
+</Package>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Log_Type_Execution_Context__c</fullName>
+    <label>Log Type/Execution Context</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Apex Exception</fullName>
+                <default>false</default>
+                <label>Apex Exception</label>
+            </value>
+            <value>
+                <fullName>Flow Exception</fullName>
+                <default>false</default>
+                <label>Flow Exception</label>
+            </value>
+            <value>
+                <fullName>UI Exception</fullName>
+                <default>false</default>
+                <label>UI Exception</label>
+            </value>
+            <value>
+                <fullName>API Transaction</fullName>
+                <default>false</default>
+                <label>API Transaction</label>
+            </value>
+            <value>
+                <fullName>Generic Transaction</fullName>
+                <default>false</default>
+                <label>Generic Transaction</label>
+            </value>
+            <value>
+                <fullName>User Action</fullName>
+                <default>false</default>
+                <label>User Action</label>
+            </value>
+            <value>
+                <fullName>Streaming API</fullName>
+                <default>false</default>
+                <label>Streaming API</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
