@@ -1,0 +1,31 @@
+<template>
+    <div class="slds-box" style="background:white; padding:0.5rem;">
+        <div class="slds-box" style="background:#f3f3f3; padding:0.5rem; border:none;">
+        <div class="slds-grid slds-wrap slds-gutters">
+            <div class="slds-col slds-size_6-of-12" style="margin: auto; font-size: 0.95rem; font-weight: bold;">
+                COGS Update
+            </div>
+            <div class="slds-col slds-size_6-of-12" style="text-align: right;">
+                <lightning-button-icon icon-name="utility:refresh"  alternative-text="refresh" title="Refresh" onclick={doRefresh}></lightning-button-icon>
+            </div>
+        </div>
+        </div>
+        <br/>
+        <div class="slds-grid slds-wrap slds-gutters">
+            <div class="slds-col slds-size_6-of-12" style="margin: auto; text-align: center;">
+                <lightning-button label="Initiate COGS Update" variant="brand" onclick={doCogsUpdate} disabled={disableButton}></lightning-button>
+            </div>
+
+            <div class="slds-col slds-size_6-of-12" style="border-left: 1px solid #c8c8c8;">
+                <lightning-badge label={batchCurrentStatus} class="slds-badge_inverse"></lightning-badge>
+                <br/><br/>
+                <lightning-badge label={running} class="slds-theme_success"></lightning-badge>
+                <br/><br/>
+                <lightning-badge label={pendingProcessing} class="slds-theme_warning" onclick={viewPending} style="cursor: pointer;"></lightning-badge>
+                <br/><br/>
+                <lightning-badge label={failedProcessing} class="slds-theme_error" onclick={viewFailed} style="cursor: pointer;"></lightning-badge>
+            </div>
+        </div>
+        <br/>
+    </div>
+</template>
