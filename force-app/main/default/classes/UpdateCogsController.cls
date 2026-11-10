@@ -43,4 +43,17 @@ public without sharing class UpdateCogsController {
         }
 	}
 
+	@AuraEnabled
+	public static void updateToReadyForRetry() {
+		List<COGSUpdateStagingRecord__c> stagingToUpdate = new List<COGSUpdateStagingRecord__c>();
+		for(COGSUpdateStagingRecord__c each : [SELECT Id FROM COGSUpdateStagingRecord__c WHERE ProcessingStatus__c = 'Failed']){
+			each.ProcessingStatus__c = 'Holding';
+			stagingToUpdate.add(each);
+		}
+
+		if(stagingToUpdate.size() > 0) {
+			update stagingToUpdate;
+		}
+	}
+
 }

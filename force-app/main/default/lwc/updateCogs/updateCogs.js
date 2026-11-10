@@ -6,6 +6,7 @@ import { NavigationMixin } from "lightning/navigation";
 
 import getStatus from '@salesforce/apex/UpdateCogsController.getStatus';
 import doUpdate from '@salesforce/apex/UpdateCogsController.doUpdate';
+import updateToReadyForRetry from '@salesforce/apex/UpdateCogsController.updateToReadyForRetry';
 
 export default class UpdateCogs extends NavigationMixin(LightningElement) {
 
@@ -14,19 +15,33 @@ export default class UpdateCogs extends NavigationMixin(LightningElement) {
     failedProcessing;
     running;
     disableButton = false;
+    showRetry = false;
+    isLoading = true;
 
     connectedCallback() {
         this.doRefresh();
     }
 
+    slotForRetry() {
+        this.isLoading = true;
+
+        updateToReadyForRetry().then(result => {
+            this.isLoading = false;
+            this.doRefresh();
+        })
+    }
+
     async doRefresh() {
+        this.isLoading = true;
         await getStatus().then(result => {
             if(result) {
+                this.showRetry = result.failedCount > 0;
                 this.disableButton = result.isJobRunning == 'true';
                 this.batchCurrentStatus = result.jobStatus;
                 this.pendingProcessing = result.pendingCount + ' Pending Processing';
                 this.failedProcessing = result.failedCount + ' Failed Processing';
                 this.running = result.runningCount + ' Processing';
+                this.isLoading = false;
             }
         })
     }

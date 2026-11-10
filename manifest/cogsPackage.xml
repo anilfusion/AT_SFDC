@@ -17,7 +17,12 @@
     <types>
         <members>COGSUpdateStagingRecord__c.ProductId__c</members>
         <members>COGSUpdateStagingRecord__c.ProcessingStatus__c</members>
+        <members>COGSUpdateStagingRecord__c.ChangeAuditRTF__c</members>
         <name>CustomField</name>
+    </types>
+    <types>
+        <members>Status_Ruleset</members>
+        <name>UiFormatSpecificationSet</name>
     </types>
     <types>
         <members>System_Log__c.All</members>

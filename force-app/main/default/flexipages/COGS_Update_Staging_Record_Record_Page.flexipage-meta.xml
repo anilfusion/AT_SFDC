@@ -43,16 +43,6 @@
             <fieldInstance>
                 <fieldInstanceProperties>
                     <name>uiBehavior</name>
-                    <value>readonly</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Name</fieldItem>
-                <identifier>RecordNameField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
                 <fieldItem>Record.ProductId__c</fieldItem>
@@ -66,6 +56,10 @@
         <itemInstances>
             <fieldInstance>
                 <fieldInstanceProperties>
+                    <name>conditionalFormatRuleset</name>
+                    <value>Status_Ruleset</value>
+                </fieldInstanceProperties>
+                <fieldInstanceProperties>
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
@@ -73,7 +67,7 @@
                 <identifier>RecordProcessingStatus_cField</identifier>
             </fieldInstance>
         </itemInstances>
-        <name>Facet-d5d69ad1-a410-4991-9fdb-c626552c50a2</name>
+        <name>Facet-42f7f65e-8525-4cbb-9266-0c47ba17d0b4</name>
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
@@ -91,13 +85,41 @@
             <componentInstance>
                 <componentInstanceProperties>
                     <name>body</name>
-                    <value>Facet-d5d69ad1-a410-4991-9fdb-c626552c50a2</value>
+                    <value>Facet-42f7f65e-8525-4cbb-9266-0c47ba17d0b4</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:column</componentName>
                 <identifier>flexipage_column2</identifier>
             </componentInstance>
         </itemInstances>
         <name>Facet-0e4ac83f-bdc9-4c92-b115-e8d1fff5f3c9</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.ChangeAuditRTF__c</fieldItem>
+                <identifier>RecordChangeAuditRTF__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-8b704feb-19f6-4f54-ac8d-b2b071431d78</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-8b704feb-19f6-4f54-ac8d-b2b071431d78</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>flexipage_column5</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-ee996df7-a1d7-4654-abc7-9b5434b206bc</name>
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
@@ -161,7 +183,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>horizontalAlignment</name>
-                    <value>false</value>
+                    <value>true</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>label</name>
@@ -169,6 +191,24 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>columns</name>
+                    <value>Facet-ee996df7-a1d7-4654-abc7-9b5434b206bc</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>horizontalAlignment</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Product Change Audit</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:fieldSection</componentName>
+                <identifier>flexipage_fieldSection3</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>

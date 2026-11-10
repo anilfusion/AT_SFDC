@@ -5,6 +5,11 @@
         <name>UpdateCOGS</name>
     </customPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>COGSUpdateStagingRecord__c.ChangeAuditRTF__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>COGSUpdateStagingRecord__c.ProcessingStatus__c</field>
         <readable>true</readable>

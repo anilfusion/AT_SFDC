@@ -57,7 +57,7 @@ public without sharing class AT_ProductCogsBatch implements Database.Batchable<s
         try {
             List<SBQQ__QuoteLine__c> updates = new List<SBQQ__QuoteLine__c>();
 			productIdsForCurrentChunk = new Set<String>();
-			List<COGSUpdateStagingRecord__c> stagingRecordsToUpdateStatus = new List<COGSUpdateStagingRecord__c>();
+			Map<Id, COGSUpdateStagingRecord__c> stagingRecordsToUpdateStatus = new Map<Id, COGSUpdateStagingRecord__c>();
 			Map<String, String> qliIdWithProductIdMap = new Map<String, String>();
 
             for (SBQQ__QuoteLine__c quoteLine : scope) {
@@ -81,16 +81,16 @@ public without sharing class AT_ProductCogsBatch implements Database.Batchable<s
             ATFE_PLMUpdateOnQuickQuoteHelper.DoNotRunATFE_SBBQQuoteLineTrigger = true;
             try {
                 List<Database.SaveResult> results = Database.update(updates, false);
+                Set<Id> failedStagingRecordIdSet = new Set<Id>();
                 for (Integer i = 0; i < results.size(); i++) {
                     if (results[i].isSuccess()) {
                         List<COGSUpdateStagingRecord__c> relatedStagingRecords = stagingRecordsByProductIdMap.get(qliIdWithProductIdMap.get(results[i].getId()));
-                        System.debug(results[i].getId());
-                        System.debug(qliIdWithProductIdMap.keyset());
-                        System.debug(stagingRecordsByProductIdMap.keyset());
                         if(relatedStagingRecords != null && relatedStagingRecords.size() > 0) {
                             for(COGSUpdateStagingRecord__c eachStagingRecord : relatedStagingRecords) {
-                                eachStagingRecord.ProcessingStatus__c = 'Success';
-						        stagingRecordsToUpdateStatus.add(eachStagingRecord);
+                                if(!failedStagingRecordIdSet.contains(eachStagingRecord.Id)){
+                                    eachStagingRecord.ProcessingStatus__c = 'Success';
+						            stagingRecordsToUpdateStatus.put(eachStagingRecord.Id, eachStagingRecord);
+                                }
                             }
                         }
                         continue;
@@ -103,13 +103,14 @@ public without sharing class AT_ProductCogsBatch implements Database.Batchable<s
                     if(relatedStagingRecords != null && relatedStagingRecords.size() > 0) {
                         for(COGSUpdateStagingRecord__c eachStagingRecord : relatedStagingRecords) {
                             eachStagingRecord.ProcessingStatus__c = 'Failed';
-                            stagingRecordsToUpdateStatus.add(eachStagingRecord);
+                            stagingRecordsToUpdateStatus.put(eachStagingRecord.Id, eachStagingRecord);
+                            failedStagingRecordIdSet.add(eachStagingRecord.Id);
                         }
                     }
                 }
             } finally {
                 ATFE_PLMUpdateOnQuickQuoteHelper.DoNotRunATFE_SBBQQuoteLineTrigger = false;
-				update stagingRecordsToUpdateStatus;
+				update stagingRecordsToUpdateStatus.values();
             }
         } catch (Exception e) {
             failureCount++;

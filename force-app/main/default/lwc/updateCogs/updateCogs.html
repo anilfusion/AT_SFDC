@@ -1,5 +1,6 @@
 <template>
-    <div class="slds-box" style="background:white; padding:0.5rem;">
+    <lightning-spinner alternative-text="Loading" size="medium" lwc:if={isLoading}></lightning-spinner>
+    <div class="slds-box" style="background:white; padding:0.5rem;" lwc:else>
         <div class="slds-box" style="background:#f3f3f3; padding:0.5rem; border:none;">
         <div class="slds-grid slds-wrap slds-gutters">
             <div class="slds-col slds-size_6-of-12" style="margin: auto; font-size: 0.95rem; font-weight: bold;">
@@ -23,7 +24,7 @@
                 <br/><br/>
                 <lightning-badge label={pendingProcessing} class="slds-theme_warning" onclick={viewPending} style="cursor: pointer;"></lightning-badge>
                 <br/><br/>
-                <lightning-badge label={failedProcessing} class="slds-theme_error" onclick={viewFailed} style="cursor: pointer;"></lightning-badge>
+                <lightning-badge label={failedProcessing} class="slds-theme_error" onclick={viewFailed} style="cursor: pointer;"></lightning-badge>&nbsp;<a lwc:if={showRetry} onclick={slotForRetry}>Retry Failed</a>
             </div>
         </div>
         <br/>
