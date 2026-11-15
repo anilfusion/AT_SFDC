@@ -7,7 +7,30 @@
         <members>AT_ProductCogsBatchTest</members>
         <members>TA_Product2_SyncQuoteLineCogs_Test</members>
         <members>UpdateCogsControllerTest</members>
+        <members>AT_ProductCogsBatch</members>
+        <members>TA_Product2_SyncQuoteLineCogs</members>
+        <members>UpdateCogsController</members>
         <name>ApexClass</name>
+    </types>
+    <types>
+        <members>updateCogs</members>
+        <name>LightningComponentBundle</name>
+    </types>
+    <types>
+        <members>COGS_Update_Staging_Record_Record_Page</members>
+        <name>FlexiPage</name>
+    </types>
+    <types>
+        <members>COGSUpdateStagingRecord__c.ChangeAuditRTF__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Status_Ruleset</members>
+        <name>UiFormatSpecificationSet</name>
+    </types>
+    <types>
+        <members>Cogs_Admin</members>
+        <name>PermissionSet</name>
     </types>
     <version>65.0</version>
 </Package>
