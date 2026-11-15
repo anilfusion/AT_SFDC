@@ -406,7 +406,7 @@
                     <criteria>
                         <leftValue>{!Record.Log_Type_Execution_Context__c}</leftValue>
                         <operator>EQUAL</operator>
-                        <rightValue>API_TRANSACTION</rightValue>
+                        <rightValue>API Transaction</rightValue>
                     </criteria>
                 </visibilityRule>
             </componentInstance>
