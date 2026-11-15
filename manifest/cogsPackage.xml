@@ -46,9 +46,15 @@
         <name>CustomPermission</name>
     </types>
     <types>
+        <members>AT_CleanUpCogsStagingTable</members>
+        <members>AT_CleanUpCogsStagingTableScheduler</members>
+        <members>AT_CleanUpCogsStagingTableTest</members>
         <members>AT_ProductCogsBatch</members>
-        <members>UpdateCogsController</members>
+        <members>AT_ProductCogsBatchTest</members>
         <members>TA_Product2_SyncQuoteLineCogs</members>
+        <members>TA_Product2_SyncQuoteLineCogs_Test</members>
+        <members>UpdateCogsController</members>
+        <members>UpdateCogsControllerTest</members>
         <name>ApexClass</name>
     </types>
     <version>65.0</version>
