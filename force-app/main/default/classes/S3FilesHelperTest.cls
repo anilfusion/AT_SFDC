@@ -42,7 +42,15 @@ private class S3FilesHelperTest {
         c.secretAccessKey = 'SECRETTEST';
         c.bucket = 'test-bucket';
         c.region = 'us-east-1';
+        c.cipherKey = EncodingUtil.base64Encode(CIPHER_KEY);
         S3Presigner.configOverride = c;
+    }
+
+    static final Blob CIPHER_KEY = Crypto.generateAesKey(256);
+
+    /** Mirrors the s3urlCipher LWC: AES-256-CBC with the IV prepended, base64 encoded. */
+    static String decrypt(String cipherText) {
+        return Crypto.decryptWithManagedIV('AES256', CIPHER_KEY, EncodingUtil.base64Decode(cipherText)).toString();
     }
 
     // S3 key prefixes are derived generically from any record's object + Id,
@@ -59,13 +67,14 @@ private class S3FilesHelperTest {
         Account a = makeRecord();
 
         S3FilesHelper.UploadTicket t = S3FilesHelper.getUploadUrl(a.Id, '../evil/name.zip', null);
+        String url = decrypt(t.cipherText);
 
         Assert.areEqual('Account/' + a.Id + '/.._evil_name.zip', t.key);
-        Assert.isTrue(t.url.startsWith('https://test-bucket.s3.us-east-1.amazonaws.com/Account/' + a.Id + '/'), t.url);
-        Assert.isTrue(t.url.contains('X-Amz-Expires=' + S3FilesHelper.UPLOAD_URL_EXPIRY_SECONDS));
-        Assert.isTrue(t.url.contains('X-Amz-SignedHeaders=host&'), t.url);
+        Assert.isTrue(url.startsWith('https://test-bucket.s3.us-east-1.amazonaws.com/Account/' + a.Id + '/'), url);
+        Assert.isTrue(url.contains('X-Amz-Expires=' + S3FilesHelper.UPLOAD_URL_EXPIRY_SECONDS));
+        Assert.isTrue(url.contains('X-Amz-SignedHeaders=host&'), url);
         Assert.isTrue(t.headers.isEmpty());
-        Assert.isFalse(t.url.contains('SECRETTEST'), 'Secret must never appear in a URL');
+        Assert.isFalse(url.contains('SECRETTEST'), 'Secret must never appear in a URL');
     }
 
     @IsTest
@@ -74,9 +83,10 @@ private class S3FilesHelperTest {
         Account a = makeRecord();
 
         S3FilesHelper.UploadTicket t = S3FilesHelper.getUploadUrl(a.Id, 'fw.bin', 'y/Q5Jg==');
+        String url = decrypt(t.cipherText);
 
         Assert.areEqual('y/Q5Jg==', t.headers.get('x-amz-checksum-crc32'));
-        Assert.isTrue(t.url.contains('X-Amz-SignedHeaders=host%3Bx-amz-checksum-crc32&'), t.url);
+        Assert.isTrue(url.contains('X-Amz-SignedHeaders=host%3Bx-amz-checksum-crc32&'), url);
     }
 
     @IsTest
@@ -109,7 +119,7 @@ private class S3FilesHelperTest {
         Account a = makeRecord();
         String key = 'Account/' + a.Id + '/report.pdf';
 
-        String url = S3FilesHelper.getFileUrl(a.Id, key, true);
+        String url = decrypt(S3FilesHelper.getFileUrl(a.Id, key, true));
 
         Assert.isTrue(url.contains('/report.pdf?'), url);
         Assert.isTrue(url.contains('response-content-disposition=attachment'), url);
@@ -317,6 +327,12 @@ private class S3FilesHelperTest {
         } catch (AuraHandledException e) {
             Assert.isNotNull(e.getMessage());
         }
+    }
+
+    @IsTest
+    static void getCipherKeyReturnsConfiguredKey() {
+        Amazon_S3__mdt m = Amazon_S3__mdt.getInstance('Amazon_s3_integration');
+        Assert.areEqual(m.URL_Encryption_Key__c, S3FilesHelper.getCipherKey());
     }
 
     @IsTest

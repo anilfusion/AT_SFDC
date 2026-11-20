@@ -18,7 +18,7 @@ private class S3PresignerTest {
     static void matchesAwsReferenceSignature() {
         useAwsExampleConfig();
 
-        String url = S3Presigner.presign('GET', 'test.txt', 86400, null);
+        String url = S3Presigner.presign('GET', 'test.txt', 86400, null, false);
 
         Assert.areEqual(
             'https://examplebucket.s3.amazonaws.com/test.txt'
@@ -36,7 +36,7 @@ private class S3PresignerTest {
         useAwsExampleConfig();
 
         String url = S3Presigner.presign('GET', '', 60,
-            new Map<String, String>{ 'prefix' => 'Account/001/', 'list-type' => '2' });
+            new Map<String, String>{ 'prefix' => 'Account/001/', 'list-type' => '2' }, false);
 
         Assert.isTrue(url.startsWith('https://examplebucket.s3.amazonaws.com/?X-Amz-Algorithm='), url);
         Assert.isTrue(url.contains('X-Amz-SignedHeaders=host&list-type=2&prefix=Account%2F001%2F&X-Amz-Signature='), url);
@@ -46,9 +46,9 @@ private class S3PresignerTest {
     static void signsExtraHeaders() {
         useAwsExampleConfig();
 
-        String plain = S3Presigner.presign('PUT', 'test.txt', 300, null);
+        String plain = S3Presigner.presign('PUT', 'test.txt', 300, null, false);
         String withChecksum = S3Presigner.presign('PUT', 'test.txt', 300, null,
-            new Map<String, String>{ 'x-amz-checksum-crc32' => 'y/Q5Jg==' });
+            new Map<String, String>{ 'x-amz-checksum-crc32' => 'y/Q5Jg==' }, false);
 
         Assert.isTrue(plain.contains('&X-Amz-SignedHeaders=host&'), plain);
         Assert.isTrue(withChecksum.contains('&X-Amz-SignedHeaders=host%3Bx-amz-checksum-crc32&'), withChecksum);
@@ -57,15 +57,15 @@ private class S3PresignerTest {
             withChecksum.substringAfter('X-Amz-Signature='),
             'Signed header must change the signature');
         // Header-less overload must still match the AWS reference vector
-        Assert.areEqual(S3Presigner.presign('GET', 'test.txt', 86400, null),
-            S3Presigner.presign('GET', 'test.txt', 86400, null, new Map<String, String>()));
+        Assert.areEqual(S3Presigner.presign('GET', 'test.txt', 86400, null, false),
+            S3Presigner.presign('GET', 'test.txt', 86400, null, new Map<String, String>(), false));
     }
 
     @IsTest
     static void rejectsUppercaseSignedHeaders() {
         useAwsExampleConfig();
         try {
-            S3Presigner.presign('PUT', 'a', 60, null, new Map<String, String>{ 'X-Amz-Checksum-Crc32' => 'x' });
+            S3Presigner.presign('PUT', 'a', 60, null, new Map<String, String>{ 'X-Amz-Checksum-Crc32' => 'x' }, false);
             Assert.fail('Expected exception');
         } catch (S3Presigner.S3Exception e) {
             Assert.isTrue(e.getMessage().contains('lowercase'));
@@ -76,7 +76,7 @@ private class S3PresignerTest {
     static void rejectsUppercaseExtraParams() {
         useAwsExampleConfig();
         try {
-            S3Presigner.presign('GET', 'a', 60, new Map<String, String>{ 'Prefix' => 'x' });
+            S3Presigner.presign('GET', 'a', 60, new Map<String, String>{ 'Prefix' => 'x' }, false);
             Assert.fail('Expected exception');
         } catch (S3Presigner.S3Exception e) {
             Assert.isTrue(e.getMessage().contains('lowercase'));
@@ -101,5 +101,43 @@ private class S3PresignerTest {
 
         Assert.areEqual('my-bucket.s3.ap-south-1.amazonaws.com', c.getHost());
         Assert.areEqual('https://my-bucket.s3.ap-south-1.amazonaws.com/a/b%20c.txt', S3Presigner.objectUrl('a/b c.txt'));
+    }
+
+    @IsTest
+    static void encryptsUrlWithCipherKey() {
+        useAwsExampleConfig();
+        Blob aesKey = Crypto.generateAesKey(256);
+        S3Presigner.configOverride.cipherKey = EncodingUtil.base64Encode(aesKey);
+
+        String plain = S3Presigner.presign('GET', 'test.txt', 86400, null, false);
+        String cipherText = S3Presigner.presign('GET', 'test.txt', 86400, null, true);
+
+        Assert.areNotEqual(plain, cipherText);
+        Assert.isFalse(cipherText.startsWith('https://'), 'Encrypted URL must not be readable');
+        String decrypted = Crypto.decryptWithManagedIV('AES256', aesKey, EncodingUtil.base64Decode(cipherText)).toString();
+        Assert.areEqual(plain, decrypted);
+    }
+
+    @IsTest
+    static void encryptionRequiresCipherKey() {
+        useAwsExampleConfig();
+        try {
+            S3Presigner.presign('GET', 'test.txt', 60, null, true);
+            Assert.fail('Expected exception');
+        } catch (AuraHandledException e) {
+            Assert.isNotNull(e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void readsConfigFromCustomMetadata() {
+        // No override: configuration comes from the Amazon_s3_integration metadata record.
+        try {
+            S3Presigner.Config c = S3Presigner.getConfig();
+            Assert.isNotNull(c.bucket);
+            Assert.areEqual(c, S3Presigner.getConfig(), 'Config should be cached');
+        } catch (S3Presigner.S3Exception e) {
+            Assert.isTrue(e.getMessage().contains('incomplete'), e.getMessage());
+        }
     }
 }
