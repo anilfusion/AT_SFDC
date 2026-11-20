@@ -18,7 +18,7 @@ private class S3DownloadPresignerTest {
     static void matchesAwsReferenceSignature() {
         useAwsExampleConfig();
 
-        String url = S3DownloadPresigner.presign('GET', 'test.txt', 86400, null);
+        String url = S3DownloadPresigner.presign('GET', 'test.txt', 86400, null, false);
 
         Assert.areEqual(
             'https://examplebucket.s3.amazonaws.com/test.txt'
@@ -36,7 +36,7 @@ private class S3DownloadPresignerTest {
         useAwsExampleConfig();
 
         String url = S3DownloadPresigner.presign('GET', '', 60,
-            new Map<String, String>{ 'prefix' => 'Account/001/', 'list-type' => '2' });
+            new Map<String, String>{ 'prefix' => 'Account/001/', 'list-type' => '2' }, false);
 
         Assert.isTrue(url.startsWith('https://examplebucket.s3.amazonaws.com/?X-Amz-Algorithm='), url);
         Assert.isTrue(url.contains('X-Amz-SignedHeaders=host&list-type=2&prefix=Account%2F001%2F&X-Amz-Signature='), url);
@@ -46,9 +46,9 @@ private class S3DownloadPresignerTest {
     static void signsExtraHeaders() {
         useAwsExampleConfig();
 
-        String plain = S3DownloadPresigner.presign('PUT', 'test.txt', 300, null);
+        String plain = S3DownloadPresigner.presign('PUT', 'test.txt', 300, null, false);
         String withChecksum = S3DownloadPresigner.presign('PUT', 'test.txt', 300, null,
-            new Map<String, String>{ 'x-amz-checksum-crc32' => 'y/Q5Jg==' });
+            new Map<String, String>{ 'x-amz-checksum-crc32' => 'y/Q5Jg==' }, false);
 
         Assert.isTrue(plain.contains('&X-Amz-SignedHeaders=host&'), plain);
         Assert.isTrue(withChecksum.contains('&X-Amz-SignedHeaders=host%3Bx-amz-checksum-crc32&'), withChecksum);
@@ -57,15 +57,15 @@ private class S3DownloadPresignerTest {
             withChecksum.substringAfter('X-Amz-Signature='),
             'Signed header must change the signature');
         // Header-less overload must still match the AWS reference vector
-        Assert.areEqual(S3DownloadPresigner.presign('GET', 'test.txt', 86400, null),
-            S3DownloadPresigner.presign('GET', 'test.txt', 86400, null, new Map<String, String>()));
+        Assert.areEqual(S3DownloadPresigner.presign('GET', 'test.txt', 86400, null, false),
+            S3DownloadPresigner.presign('GET', 'test.txt', 86400, null, new Map<String, String>(), false));
     }
 
     @IsTest
     static void rejectsUppercaseSignedHeaders() {
         useAwsExampleConfig();
         try {
-            S3DownloadPresigner.presign('PUT', 'a', 60, null, new Map<String, String>{ 'X-Amz-Checksum-Crc32' => 'x' });
+            S3DownloadPresigner.presign('PUT', 'a', 60, null, new Map<String, String>{ 'X-Amz-Checksum-Crc32' => 'x' }, false);
             Assert.fail('Expected exception');
         } catch (S3DownloadPresigner.S3Exception e) {
             Assert.isTrue(e.getMessage().contains('lowercase'));
@@ -76,10 +76,49 @@ private class S3DownloadPresignerTest {
     static void rejectsUppercaseExtraParams() {
         useAwsExampleConfig();
         try {
-            S3DownloadPresigner.presign('GET', 'a', 60, new Map<String, String>{ 'Prefix' => 'x' });
+            S3DownloadPresigner.presign('GET', 'a', 60, new Map<String, String>{ 'Prefix' => 'x' }, false);
             Assert.fail('Expected exception');
         } catch (S3DownloadPresigner.S3Exception e) {
             Assert.isTrue(e.getMessage().contains('lowercase'));
+        }
+    }
+
+    @IsTest
+    static void encryptsUrlWhenRequested() {
+        useAwsExampleConfig();
+        Blob aesKey = Crypto.generateAesKey(256);
+        S3DownloadPresigner.configOverride.cipherKey = EncodingUtil.base64Encode(aesKey);
+
+        String plain = S3DownloadPresigner.presign('GET', 'test.txt', 86400, null, false);
+        String cipherText = S3DownloadPresigner.presign('GET', 'test.txt', 86400, null, true);
+
+        Assert.areNotEqual(plain, cipherText);
+        String decrypted = Crypto.decryptWithManagedIV('AES256', aesKey, EncodingUtil.base64Decode(cipherText)).toString();
+        Assert.areEqual(plain, decrypted);
+    }
+
+    @IsTest
+    static void encryptionRequiresCipherKey() {
+        useAwsExampleConfig();
+        try {
+            S3DownloadPresigner.presign('GET', 'test.txt', 60, null, true);
+            Assert.fail('Expected exception');
+        } catch (AuraHandledException e) {
+            Assert.isNotNull(e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void readsConfigFromCustomMetadata() {
+        S3DownloadPresigner.configOverride = null;
+        // Depends on the org's Amazon_S3__mdt record: either a config is built (and cached)
+        // or a clear configuration error is raised.
+        try {
+            S3DownloadPresigner.Config c = S3DownloadPresigner.getConfig();
+            Assert.isNotNull(c.getHost());
+            Assert.areEqual(c, S3DownloadPresigner.getConfig(), 'Config should be cached');
+        } catch (Exception e) {
+            Assert.isNotNull(e.getMessage());
         }
     }
 

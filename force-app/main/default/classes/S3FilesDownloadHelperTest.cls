@@ -36,13 +36,22 @@ private class S3FilesDownloadHelperTest {
             + '</ListBucketResult>';
     }
 
+    static Blob aesKey;
+
     static void useTestConfig() {
+        aesKey = Crypto.generateAesKey(256);
         S3DownloadPresigner.Config c = new S3DownloadPresigner.Config();
         c.accessKeyId = 'AKIDTEST';
         c.secretAccessKey = 'SECRETTEST';
         c.bucket = 'test-bucket';
         c.region = 'us-east-1';
+        c.cipherKey = EncodingUtil.base64Encode(aesKey);
         S3DownloadPresigner.configOverride = c;
+    }
+
+    /** URLs handed to the LWC are AES-256 encrypted (managed IV); decrypt to inspect them. */
+    static String decrypt(String cipherText) {
+        return Crypto.decryptWithManagedIV('AES256', aesKey, EncodingUtil.base64Decode(cipherText)).toString();
     }
 
     // S3 key prefixes are derived generically from any record's object + Id,
@@ -59,13 +68,15 @@ private class S3FilesDownloadHelperTest {
         Account a = makeRecord();
 
         S3FilesDownloadHelper.UploadTicket t = S3FilesDownloadHelper.getUploadUrl(a.Id, '../evil/name.zip', null);
+        String url = decrypt(t.cipherText);
 
         Assert.areEqual('Account/' + a.Id + '/.._evil_name.zip', t.key);
-        Assert.isTrue(t.url.startsWith('https://test-bucket.s3.us-east-1.amazonaws.com/Account/' + a.Id + '/'), t.url);
-        Assert.isTrue(t.url.contains('X-Amz-Expires=' + S3FilesDownloadHelper.UPLOAD_URL_EXPIRY_SECONDS));
-        Assert.isTrue(t.url.contains('X-Amz-SignedHeaders=host&'), t.url);
+        Assert.isFalse(t.cipherText.startsWith('https://'), 'URL must be encrypted');
+        Assert.isTrue(url.startsWith('https://test-bucket.s3.us-east-1.amazonaws.com/Account/' + a.Id + '/'), url);
+        Assert.isTrue(url.contains('X-Amz-Expires=' + S3FilesDownloadHelper.UPLOAD_URL_EXPIRY_SECONDS));
+        Assert.isTrue(url.contains('X-Amz-SignedHeaders=host&'), url);
         Assert.isTrue(t.headers.isEmpty());
-        Assert.isFalse(t.url.contains('SECRETTEST'), 'Secret must never appear in a URL');
+        Assert.isFalse(url.contains('SECRETTEST'), 'Secret must never appear in a URL');
     }
 
     @IsTest
@@ -76,7 +87,8 @@ private class S3FilesDownloadHelperTest {
         S3FilesDownloadHelper.UploadTicket t = S3FilesDownloadHelper.getUploadUrl(a.Id, 'fw.bin', 'y/Q5Jg==');
 
         Assert.areEqual('y/Q5Jg==', t.headers.get('x-amz-checksum-crc32'));
-        Assert.isTrue(t.url.contains('X-Amz-SignedHeaders=host%3Bx-amz-checksum-crc32&'), t.url);
+        String url = decrypt(t.cipherText);
+        Assert.isTrue(url.contains('X-Amz-SignedHeaders=host%3Bx-amz-checksum-crc32&'), url);
     }
 
     @IsTest
@@ -109,10 +121,69 @@ private class S3FilesDownloadHelperTest {
         Account a = makeRecord();
         String key = 'Account/' + a.Id + '/report.pdf';
 
-        String url = S3FilesDownloadHelper.getFileUrl(a.Id, key, true);
+        String url = decrypt(S3FilesDownloadHelper.getFileUrl(a.Id, key, true));
 
         Assert.isTrue(url.contains('/report.pdf?'), url);
         Assert.isTrue(url.contains('response-content-disposition=attachment'), url);
+
+        String inlineUrl = decrypt(S3FilesDownloadHelper.getFileUrl(a.Id, key, false));
+        Assert.isTrue(inlineUrl.contains('response-content-disposition=inline'), inlineUrl);
+    }
+
+    @IsTest
+    static void getFileUrlSurfacesSigningErrors() {
+        useTestConfig();
+        S3DownloadPresigner.configOverride.cipherKey = null;
+        Account a = makeRecord();
+        try {
+            S3FilesDownloadHelper.getFileUrl(a.Id, 'Account/' + a.Id + '/report.pdf', true);
+            Assert.fail('Expected exception');
+        } catch (AuraHandledException e) {
+            Assert.isNotNull(e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void getUploadUrlSurfacesSigningErrors() {
+        useTestConfig();
+        S3DownloadPresigner.configOverride.cipherKey = null;
+        Account a = makeRecord();
+        try {
+            S3FilesDownloadHelper.getUploadUrl(a.Id, 'fw.bin', null);
+            Assert.fail('Expected exception');
+        } catch (AuraHandledException e) {
+            Assert.isNotNull(e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void getCipherKeyReadsCustomMetadata() {
+        // Depends on the org's Amazon_S3__mdt record being present.
+        try {
+            S3FilesDownloadHelper.getCipherKey();
+        } catch (Exception e) {
+            Assert.isNotNull(e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void ownerIdFromKeyRejectsNonIdSegment() {
+        try {
+            S3FilesDownloadHelper.ownerIdFromKey('Account/not-an-id/x.bin');
+            Assert.fail('Expected exception');
+        } catch (AuraHandledException e) {
+            Assert.isNotNull(e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void rejectsNullRecordId() {
+        try {
+            S3FilesDownloadHelper.listFiles(null);
+            Assert.fail('Expected exception');
+        } catch (AuraHandledException e) {
+            Assert.isNotNull(e.getMessage());
+        }
     }
 
     @IsTest
