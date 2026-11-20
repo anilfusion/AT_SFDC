@@ -1,11 +1,13 @@
 import { api, LightningElement } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { decryptFromApex } from 'c/s3urlCipher';
 
 import listFiles from '@salesforce/apex/S3FilesHelper.listFiles';
 import getUploadUrl from '@salesforce/apex/S3FilesHelper.getUploadUrl';
 import getFileUrl from '@salesforce/apex/S3FilesHelper.getFileUrl';
 import deleteFile from '@salesforce/apex/S3FilesHelper.deleteFile';
 import createSoftwareRecord from '@salesforce/apex/S3FilesHelper.createSoftwareRecord';
+import getCipherKey from '@salesforce/apex/S3FilesHelper.getCipherKey';
 
 import { crc32Base64, putToS3, triggerDownload, openInNewTab, toFileRows, errorMessage } from 'c/s3FileService';
 import { fileTypesMap } from './utilities';
@@ -54,7 +56,10 @@ export default class AmazonS3Files extends LightningElement {
     async view(event) {
         const key = event.currentTarget.dataset.key;
         try {
-            await openInNewTab(() => getFileUrl({ recordId: this.recordId, key, asAttachment: false }));
+            const cipherText = await getFileUrl({ recordId: this.recordId, key, asAttachment: false });
+            const cipherKey = await getCipherKey();
+            const url = await decryptFromApex(cipherText, cipherKey);
+            openInNewTab(url);
         } catch (error) {
             this.toast('Error opening file', errorMessage(error), 'error');
         }
@@ -96,7 +101,9 @@ export default class AmazonS3Files extends LightningElement {
         const checksumCrc32 = await crc32Base64(file, (pct) => {
             this.progress = Math.max(1, Math.round(pct * 0.2));
         });
-        const { key, url, headers } = await getUploadUrl({ recordId: this.recordId, fileName: file.name, checksumCrc32 });
+        const { key, cipherText, headers } = await getUploadUrl({ recordId: this.recordId, fileName: file.name, checksumCrc32 });
+        const cipherKey = await getCipherKey();
+        const url = await decryptFromApex(cipherText, cipherKey);
         const etag = await putToS3(url, file, (pct) => {
             this.progress = 20 + Math.round(pct * 0.8);
         }, headers);

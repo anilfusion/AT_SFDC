@@ -29,7 +29,7 @@ public with sharing class S3FilesHelper {
 
     public class UploadTicket {
         @AuraEnabled public String key;
-        @AuraEnabled public String url;
+        @AuraEnabled public String cipherText;
         /** Headers the browser must send, with exactly these values, on the PUT. */
         @AuraEnabled public Map<String, String> headers;
     }
@@ -60,7 +60,7 @@ public with sharing class S3FilesHelper {
                 if (continuationToken != null) {
                     query.put('continuation-token', continuationToken);
                 }
-                HttpResponse res = send('GET', S3Presigner.presign('GET', '', 60, query));
+                HttpResponse res = send('GET', S3Presigner.presign('GET', '', 60, query, false));
                 if (res.getStatusCode() != 200) {
                     throw new S3Presigner.S3Exception('S3 list failed: ' + res.getStatusCode() + ' ' + res.getBody());
                 }
@@ -121,11 +121,17 @@ public with sharing class S3FilesHelper {
             t.headers.put('x-amz-checksum-crc32', checksumCrc32);
         }
         try {
-            t.url = S3Presigner.presign('PUT', t.key, UPLOAD_URL_EXPIRY_SECONDS, null, t.headers);
+            t.cipherText = S3Presigner.presign('PUT', t.key, UPLOAD_URL_EXPIRY_SECONDS, null, t.headers, true);
         } catch (Exception e) {
             throw auraError(e);
         }
         return t;
+    }
+
+    /** Key the LWC needs to decrypt. Anything returned here is readable in the browser. */
+    @AuraEnabled
+    public static String getCipherKey() {
+        return Amazon_S3__mdt.getInstance('Amazon_s3_integration').URL_Encryption_Key__c;
     }
 
     /**
@@ -138,7 +144,7 @@ public with sharing class S3FilesHelper {
         requireKeyBelongsToRecord(recordId, key);
         try {
             return S3Presigner.presign('GET', key, DOWNLOAD_URL_EXPIRY_SECONDS,
-                dispositionParams(key, asAttachment == true));
+                dispositionParams(key, asAttachment == true), true);
         } catch (Exception e) {
             throw auraError(e);
         }
@@ -150,7 +156,7 @@ public with sharing class S3FilesHelper {
         requireEditAccess(recordId);
         requireKeyBelongsToRecord(recordId, key);
         try {
-            HttpResponse res = send('DELETE', S3Presigner.presign('DELETE', key, 60, null));
+            HttpResponse res = send('DELETE', S3Presigner.presign('DELETE', key, 60, null, false));
             if (res.getStatusCode() != 204 && res.getStatusCode() != 200) {
                 throw new S3Presigner.S3Exception('S3 delete failed: ' + res.getStatusCode() + ' ' + res.getBody());
             }
@@ -250,7 +256,7 @@ public with sharing class S3FilesHelper {
         }
         try {
             return S3Presigner.presign('GET', softwareFile.File_Key__c, DOWNLOAD_URL_EXPIRY_SECONDS,
-                dispositionParams(softwareFile.File_Key__c, true));
+                dispositionParams(softwareFile.File_Key__c, true), true);
         } catch (Exception e) {
             throw auraError(e);
         }

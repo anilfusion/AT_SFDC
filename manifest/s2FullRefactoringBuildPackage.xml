@@ -8,6 +8,7 @@
         <members>amazonS3SecureDownload</members>
         <members>amazonS3Software</members>
         <members>s3FileService</members>
+        <members>s3urlCipher</members>
         <name>LightningComponentBundle</name>
     </types>
     <types>

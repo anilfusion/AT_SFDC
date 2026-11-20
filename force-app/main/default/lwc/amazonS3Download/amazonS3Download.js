@@ -1,7 +1,9 @@
 import { api, wire, LightningElement } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
+import { decryptFromApex } from 'c/s3urlCipher';
 import getSoftwareFile from '@salesforce/apex/S3FilesHelper.getSoftwareFile';
 import getDownloadUrl from '@salesforce/apex/S3FilesHelper.getDownloadUrl';
+import getCipherKey from '@salesforce/apex/S3FilesHelper.getCipherKey';
 
 /**
  * Download button for an entitled Software_File__c.
@@ -54,7 +56,11 @@ export default class AmazonS3Download extends LightningElement {
         try {
             // Content-Disposition: attachment (with the file name) is signed into the URL,
             // so the browser downloads the file natively in the background.
-            const url = await getDownloadUrl({ recordId: this.recordId });
+            const [cipherText, cipherKey] = await Promise.all([
+                getDownloadUrl({ recordId: this.recordId }),
+                getCipherKey()
+            ]);
+            const url = await decryptFromApex(cipherText, cipherKey);
             const link = document.createElement('a');
             link.href = url;
             link.rel = 'noopener';

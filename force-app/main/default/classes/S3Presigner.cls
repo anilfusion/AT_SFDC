@@ -15,6 +15,7 @@ public inherited sharing class S3Presigner {
         public String secretAccessKey;
         public String bucket;
         public String region;
+        public String cipherKey;
         public String host; // optional override; defaults to virtual-hosted style endpoint
 
         public String getHost() {
@@ -33,22 +34,14 @@ public inherited sharing class S3Presigner {
         if (cachedConfig != null) {
             return cachedConfig;
         }
-        List<Amazon_S3__mdt> rows = [
-            SELECT Access_Key_Id__c, Secret_Access_Key__c,
-                   Bucket__c, Bucket_Sandbox__c, Region__c, Region_Sandbox__c
-            FROM Amazon_S3__mdt
-            WHERE DeveloperName = 'Amazon_S3_Integration'
-            LIMIT 1
-        ];
-        if (rows.isEmpty()) {
-            throw new S3Exception('Amazon S3 configuration is missing');
-        }
-        Amazon_S3__mdt m = rows[0];
+
+        Amazon_S3__mdt m = Amazon_S3__mdt.getInstance('Amazon_s3_integration');
         Boolean isSandbox = [SELECT IsSandbox FROM Organization LIMIT 1].IsSandbox;
 
         Config c = new Config();
         c.accessKeyId = m.Access_Key_Id__c;
         c.secretAccessKey = m.Secret_Access_Key__c;
+        c.cipherKey = m.URL_Encryption_Key__c;
         c.bucket = isSandbox ? m.Bucket_Sandbox__c : m.Bucket__c;
         c.region = isSandbox ? m.Region_Sandbox__c : m.Region__c;
 
@@ -72,8 +65,21 @@ public inherited sharing class S3Presigner {
      * @param extra      additional query parameters to sign (lowercase names, e.g. 'prefix',
      *                   'list-type', 'response-content-disposition'); may be null
      */
-    public static String presign(String method, String key, Integer expiresSec, Map<String, String> extra) {
-        return presign(method, key, expiresSec, extra, null);
+    public static String presign(String method, String key, Integer expiresSec, Map<String, String> extra, Boolean encryptUrl) {
+        return presign(method, key, expiresSec, extra, null, encryptUrl);
+    }
+
+    static String encrypt(String plainText, String cipherKey) {
+        // AES-256-CBC, PKCS5 padding; the random 16-byte IV is prepended to the ciphertext
+        Blob cipher = Crypto.encryptWithManagedIV('AES256', key(cipherKey), Blob.valueOf(plainText));
+        return EncodingUtil.base64Encode(cipher);
+    }
+
+    static Blob key(String cipherKey) {
+        if (String.isBlank(cipherKey)) {
+            throw new AuraHandledException('URL cipher key is not configured.');
+        }
+        return EncodingUtil.base64Decode(cipherKey);
     }
 
     /**
@@ -83,7 +89,7 @@ public inherited sharing class S3Presigner {
      * @param signedHeaders lowercase header name => value; may be null
      */
     public static String presign(String method, String key, Integer expiresSec,
-                                 Map<String, String> extra, Map<String, String> signedHeaders) {
+                                 Map<String, String> extra, Map<String, String> signedHeaders, Boolean encryptUrl) {
         Config cfg = getConfig();
         String host = cfg.getHost();
 
@@ -152,7 +158,11 @@ public inherited sharing class S3Presigner {
         signingKey = hmac('aws4_request', signingKey);
         String signature = EncodingUtil.convertToHex(hmac(stringToSign, signingKey));
 
-        return 'https://' + host + canonicalUri + '?' + canonicalQuery + '&X-Amz-Signature=' + signature;
+        if(encryptUrl) {
+            return encrypt('https://' + host + canonicalUri + '?' + canonicalQuery + '&X-Amz-Signature=' + signature, cfg.cipherKey);
+        } else {
+            return 'https://' + host + canonicalUri + '?' + canonicalQuery + '&X-Amz-Signature=' + signature;
+        }
     }
 
     static Blob hmac(String data, Blob key) {
