@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>amazonS3Download</members>
+        <members>amazonS3FetchDetails</members>
+        <members>amazonS3Files</members>
+        <members>amazonS3LoadAndFetchDetails</members>
+        <members>amazonS3SecureDownload</members>
+        <members>amazonS3Software</members>
+        <members>s3FileService</members>
+        <name>LightningComponentBundle</name>
+    </types>
+    <types>
+        <members>S3FilesHelper</members>
+        <members>S3FilesHelperTest</members>
+        <members>S3Presigner</members>
+        <members>S3PresignerTest</members>
+        <name>ApexClass</name>
+    </types>
+    <version>65.0</version>
+</Package>
