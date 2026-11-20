@@ -18,5 +18,9 @@
         <members>S3PresignerTest</members>
         <name>ApexClass</name>
     </types>
+    <types>
+        <members>Amazon_S3__mdt.URL_Encryption_Key__c</members>
+        <name>CustomField</name>
+    </types>
     <version>65.0</version>
 </Package>
